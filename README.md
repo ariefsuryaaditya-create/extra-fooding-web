@@ -27,3 +27,6 @@ VITE_SUPABASE_ANON_KEY=YOUR_PUBLISHABLE_OR_ANON_KEY
 ```
 
 Jangan pernah memasukkan Supabase service-role/secret key ke frontend.
+
+## NIK-only leader access
+Leader tidak lagi menggunakan email/password. Halaman `/` meminta NIK, lalu database mengembalikan nama dan satu kelompok kerja sesuai NIK. Jalankan `supabase_nik_only.sql` di Supabase SQL Editor sebelum deploy versi ini. Admin tetap dapat login melalui `/admin`. Jangan menaruh Service Role key di frontend.
