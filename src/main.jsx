@@ -84,11 +84,10 @@ function Admin({profile}){
  async function printReport(){
   if(!period){setErr('Pilih periode terlebih dahulu.');return}
   setErr('');
-  const {data:empData,error:ee}=await supabase.from('employees').select('id,nik,name,active,work_group_id,work_groups(name)').eq('active',true).order('nik');
+  const {data:empData,error:ee}=await supabase.from('employees').select('id,nik,name,active,work_group_id,work_groups(name)').eq('active',true).order('name');
   if(ee){setErr(ee.message);return}
   const {data:entryData,error:xe}=await supabase.from('extra_fooding').select('employee_id,food_date,shift,status').eq('period_id',period.id);
   if(xe){setErr(xe.message);return}
-
   const byEmployee={};
   (entryData||[]).forEach(r=>{(byEmployee[r.employee_id]??={})[r.food_date]=r})
   const selectedGroups=groupFilter==='ALL'?groups:groups.filter(g=>g.id===groupFilter);
@@ -96,122 +95,31 @@ function Admin({profile}){
   const dateCols=dateList(period);
   const periodLabel=`${fmt(period.start_date)}-${fmt(period.end_date)}`;
   const escapeHtml=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  const logoSrc='data:image/png;base64,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';
-
-  const groupPage=(group,pageEmployees)=>{
+  const groupPage=(group, pageEmployees)=>{
     const rowsHtml=Array.from({length:35},(_,i)=>{
       const e=pageEmployees[i];
-      if(!e)return `<tr><td>${i+1}</td><td></td><td></td>${dateCols.map(()=>'<td></td>').join('')}<td></td><td></td></tr>`;
+      if(!e)return `<tr><td class="center">${i+1}</td><td></td><td></td>${dateCols.map(()=>'<td class="food empty"><span class="xmark">×</span></td>').join('')}<td></td><td></td></tr>`;
       const map=byEmployee[e.id]||{};
       const total=dateCols.reduce((n,d)=>n+(map[d]?1:0),0);
-      return `<tr><td>${i+1}</td><td class="nik">${escapeHtml(e.nik)}</td><td class="name-cell">${escapeHtml(e.name)}</td>${dateCols.map(d=>{const r=map[d];return `<td class="food">${r?`<span class="mark">X</span><span class="shift">S${r.shift}</span>`:''}</td>`}).join('')}<td class="total">${total||''}</td><td></td></tr>`
+      return `<tr><td class="center">${i+1}</td><td class="nik">${escapeHtml(e.nik)}</td><td class="name-cell">${escapeHtml(e.name)}</td>${dateCols.map(d=>{const r=map[d];if(!r)return `<td class="food empty"><span class="xmark">×</span></td>`;const t=SHIFT[r.shift]?.time||'';const [start,end]=t.split('–');return `<td class="food filled"><div class="shift-time">${start||''}<br>${end||''}</div></td>`}).join('')}<td class="center total">${total||''}</td><td></td></tr>`
     }).join('');
-
     const total=pageEmployees.reduce((n,e)=>n+dateCols.filter(d=>byEmployee[e.id]?.[d]).length,0);
-    const dayTotals=dateCols.map(d=>pageEmployees.filter(e=>byEmployee[e.id]?.[d]).length||'');
-
-    return `<section class="ef-page">
-      <table class="top-table"><tr>
-        <td class="logo-cell"><img src="${logoSrc}" alt="NAI"></td>
-        <td class="title-cell" colspan="10"><div class="doc-title">Extra fooding 生产班中就餐补贴单</div></td>
-      </tr><tr>
-        <td class="logo-spacer"></td>
-        <td class="company-cell" colspan="10">PT NEW ASIA INTERNATIONAL</td>
-      </tr></table>
-
-      <table class="meta-table">
-        <tr>
-          <td class="meta-label">Departemen<br>部门</td><td class="meta-value dept">SLITTING</td>
-          <td class="meta-label">Grup Kerja<br>班组</td><td class="meta-value group">${escapeHtml(group.name)}</td>
-          <td class="meta-label">JAM AWAL<br>开始时间</td><td class="meta-value"></td>
-          <td class="meta-label">JAM AKHIR<br>结束时间</td><td class="meta-value"></td>
-          <td class="meta-label">Periode<br>月份</td><td class="meta-value">${periodLabel}</td>
-        </tr>
-        <tr class="sign-row">
-          <td colspan="3">TTD Kepala bagian<br>负责人</td><td></td>
-          <td colspan="3">TTD Kepala Divisi<br>部门主管</td><td></td>
-          <td colspan="2"></td>
-        </tr>
-      </table>
-
-      <table class="ef-table">
-        <colgroup>
-          <col class="c-no"><col class="c-nik"><col class="c-name">
-          ${dateCols.map(()=>'<col class="c-day">').join('')}
-          <col class="c-total"><col class="c-sign">
-        </colgroup>
-        <thead><tr>
-          <th>NO<br>序号</th><th>NIK 工号</th><th>Nama Karyawan 员工姓名</th>
-          ${dateCols.map(d=>`<th>${fmt(d)}<br>日</th>`).join('')}
-          <th>Total<br>合计</th><th>TTD<br>Karyawan<br>员工签字</th>
-        </tr></thead>
-        <tbody>${rowsHtml}</tbody>
-        <tfoot>
-          <tr><td></td><td colspan="2" class="footer-label">TOTAL EXTRA FOODING</td>${dayTotals.map(v=>`<td>${v}</td>`).join('')}<td>${total||''}</td><td></td></tr>
-          <tr><td></td><td colspan="2" class="footer-label">Nomor sistem NAI</td>${dateCols.map(()=>'<td></td>').join('')}<td></td><td></td></tr>
-          <tr><td></td><td colspan="2" class="footer-label">Nomor sistem KBM</td>${dateCols.map(()=>'<td></td>').join('')}<td></td><td></td></tr>
-          <tr><td></td><td colspan="2" class="footer-label">Nomor sistem MAR</td>${dateCols.map(()=>'<td></td>').join('')}<td></td><td></td></tr>
-        </tfoot>
-      </table>
-      <div class="shift-legend"><b>Keterangan Shift:</b> Shift 1 = 12:00-13:00 &nbsp;&nbsp; Shift 2 = 20:00-21:00 &nbsp;&nbsp; Shift 3 = 04:00-05:00 &nbsp;&nbsp; X = Mendapat Extra Fooding</div>
-    </section>`
+    return `<section class="ef-page"><div class="title">Extra fooding 生产班中就餐补贴单</div><div class="company">PT NEW ASIA INTERNATIONAL</div><div class="meta-grid"><div class="meta-label">Departemen<br>部门</div><div class="meta-value dept">SLITTING</div><div class="meta-label">Grup Kerja<br>班组</div><div class="meta-value group">${escapeHtml(group.name)}</div><div class="meta-label">JAM AWAL<br>开始时间</div><div class="meta-value">Mengikuti Shift</div><div class="meta-label">JAM AKHIR<br>结束时间</div><div class="meta-value">Mengikuti Shift</div><div class="meta-label">Periode<br>月份</div><div class="meta-value">${periodLabel}</div></div><div class="sign-grid"><div>TTD Kepala bagian<br>负责人</div><div></div><div>TTD Kepala Divisi<br>部门主管</div><div></div></div><table class="ef-table"><thead><tr><th>NO 序号</th><th>NIK 工号</th><th>Nama Karyawan 员工姓名</th>${dateCols.map(d=>`<th>${fmt(d)}日</th>`).join('')}<th>Total<br>合计</th><th>TTD Karyawan<br>员工签字</th></tr></thead><tbody>${rowsHtml}</tbody><tfoot><tr><td></td><td colspan="2" class="footer-label">TOTAL EXTRA FOODING</td>${dateCols.map(d=>`<td class="center">${pageEmployees.filter(e=>byEmployee[e.id]?.[d]).length||''}</td>`).join('')}<td class="center">${total||''}</td><td></td></tr><tr><td></td><td colspan="2" class="footer-label">Nomor sistem NAI</td>${dateCols.map(()=>'<td></td>').join('')}<td></td><td></td></tr><tr><td></td><td colspan="2" class="footer-label">Nomor sistem KBM</td>${dateCols.map(()=>'<td></td>').join('')}<td></td><td></td></tr><tr><td></td><td colspan="2" class="footer-label">Nomor sistem MAR</td>${dateCols.map(()=>'<td></td>').join('')}<td></td><td></td></tr></tfoot></table><div class="shift-legend"><b>Keterangan Shift:</b> Shift 1 = 12:00-13:00 &nbsp;&nbsp; Shift 2 = 20:00-21:00 &nbsp;&nbsp; Shift 3 = 04:00-05:00 &nbsp;&nbsp; X = Mendapat Extra Fooding</div></section>`
   };
-
   const pages=[];
   selectedGroups.forEach(g=>{
     const list=(empData||[]).filter(e=>e.work_group_id===g.id);
     if(!list.length)pages.push(groupPage(g,[]));
     else for(let i=0;i<list.length;i+=35)pages.push(groupPage(g,list.slice(i,i+35)));
   });
-
   const win=window.open('','_blank','width=1200,height=900');
   if(!win){setErr('Popup diblokir browser. Izinkan popup untuk mencetak.');return}
   win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>FORM EXTRA FOODING - ${escapeHtml(period.name)}</title><style>${printCss()}</style></head><body>${pages.join('')}</body></html>`);
   win.document.close();
   win.focus();
-  setTimeout(()=>win.print(),700);
+  setTimeout(()=>win.print(),500);
  }
- function printCss(){return `
-  @page{size:A4 portrait;margin:7mm}
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#fff;color:#000;font-family:Arial,Calibri,sans-serif}
-  body{font-size:9px}
-  .ef-page{width:196mm;min-height:283mm;page-break-after:always;break-after:page}
-  .ef-page:last-child{page-break-after:auto;break-after:auto}
-  table{border-collapse:collapse}
-  .top-table{width:100%;table-layout:fixed;border:1px solid #000}
-  .top-table td{border:1px solid #000;height:8mm;padding:0}
-  .logo-cell{width:25mm;height:12mm!important;text-align:left;vertical-align:middle;padding-left:1mm!important}
-  .logo-cell img{width:19mm;height:11mm;object-fit:contain;display:block}
-  .logo-spacer{width:25mm;height:6mm!important;border-top:0!important}
-  .title-cell{height:8mm!important;text-align:center;vertical-align:middle}
-  .doc-title{font-size:16px;font-weight:700;line-height:1}
-  .company-cell{height:7mm!important;text-align:center;font-size:15px;font-weight:700;vertical-align:middle}
-
-  .meta-table{width:100%;table-layout:fixed;border-left:1px solid #000;border-right:1px solid #000}
-  .meta-table td{border-right:1px solid #000;border-bottom:1px solid #000;text-align:center;vertical-align:middle;height:9mm;padding:1mm;font-size:8px;line-height:1.05}
-  .meta-table td:last-child{border-right:0}
-  .meta-table .meta-label{font-weight:400}
-  .meta-table .meta-value{font-weight:700}
-  .meta-table .dept,.meta-table .group{font-size:9px}
-  .sign-row td{height:10mm!important;font-size:8px}
-  .sign-row td[colspan="3"]{font-weight:700}
-
-  .ef-table{width:100%;table-layout:fixed;border:1px solid #000}
-  .ef-table th,.ef-table td{border:1px solid #000;text-align:center;vertical-align:middle;padding:0;font-size:7.5px;line-height:1.05;height:6.4mm}
-  .ef-table th{height:9.5mm;font-size:8px;font-weight:700}
-  .ef-table .c-no{width:7mm}.ef-table .c-nik{width:18mm}.ef-table .c-name{width:46mm}
-  .ef-table .c-day{width:13mm}.ef-table .c-total{width:14mm}.ef-table .c-sign{width:20mm}
-  .ef-table .nik{font-size:8.5px;font-weight:700}
-  .ef-table .name-cell{text-align:left;padding-left:1.2mm;font-size:8px;font-weight:700;white-space:normal;word-break:normal}
-  .ef-table .food{height:6.4mm}
-  .mark{display:block;font-size:10px;font-weight:700;line-height:1}
-  .shift{display:block;font-size:6px;line-height:1;margin-top:.3mm}
-  .total{font-size:8.5px;font-weight:700}
-  .footer-label{text-align:left!important;padding-left:2mm!important;font-weight:700;font-size:7.5px!important}
-  .shift-legend{font-size:7.5px;margin-top:2mm;line-height:1.2}
-  @media print{.ef-page{break-after:page}.ef-page:last-child{break-after:auto}}
- `}
+ function printCss(){return `@page{size:A4 portrait;margin:7mm}*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;color:#000}.ef-page{width:196mm;min-height:283mm;page-break-after:always;position:relative}.ef-page:last-child{page-break-after:auto}.title{text-align:center;font-size:18px;font-weight:700;line-height:1.05;margin:0 0 1mm}.company{text-align:center;font-size:18px;font-weight:700;margin-bottom:2mm}.meta-grid{display:grid;grid-template-columns:13mm 22mm 13mm 35mm 17mm 21mm 17mm 21mm 17mm 20mm;border:1px solid #000}.meta-grid>div{border-right:1px solid #000;border-bottom:1px solid #000;min-height:9mm;padding:1mm;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center}.meta-grid>div:nth-child(10),.meta-grid>div:nth-child(20){border-right:0}.meta-grid>div:nth-child(n+11){border-bottom:0}.meta-label{line-height:1.05}.meta-value{font-weight:600}.dept{font-weight:700}.group{font-weight:700}.sign-grid{display:grid;grid-template-columns:45mm 53mm 45mm 53mm;border-left:1px solid #000;border-right:1px solid #000;border-bottom:1px solid #000;min-height:12mm}.sign-grid>div{border-right:1px solid #000;padding:1mm;font-size:9px;text-align:center;display:flex;align-items:center;justify-content:center}.sign-grid>div:last-child{border-right:0}.ef-table{width:100%;border-collapse:collapse;table-layout:fixed}.ef-table th,.ef-table td{border:1px solid #000;padding:0.7mm;text-align:center;vertical-align:middle;font-size:8px;height:6.4mm}.ef-table th{font-size:9px;height:10mm;line-height:1.05}.ef-table th:nth-child(1){width:7mm}.ef-table th:nth-child(2){width:18mm}.ef-table th:nth-child(3){width:46mm}.ef-table th:nth-child(n+4):nth-child(-n+10){width:13mm}.ef-table th:nth-child(11){width:14mm}.ef-table th:nth-child(12){width:20mm}.ef-table .nik{font-weight:700;font-size:9px}.ef-table .name-cell{font-weight:700;font-size:8.5px;text-align:left;padding-left:1.2mm}.food{position:relative;line-height:1;padding:0!important;height:6.4mm;overflow:hidden}.food.empty::before,.food.empty::after{content:"";position:absolute;left:-1px;top:50%;width:calc(100% + 2px);height:1px;background:#000;transform-origin:center}.food.empty::before{transform:rotate(26deg)}.food.empty::after{transform:rotate(-26deg)}.xmark{display:none}.food.filled::before{content:"";position:absolute;left:0;top:50%;width:100%;height:1px;background:#000;transform:rotate(-26deg);transform-origin:center}.shift-time{position:relative;z-index:1;font-size:7px;font-weight:700;line-height:1.15;background:#fff;display:inline-block;padding:0 .4mm}.total{font-size:9px;font-weight:700}.footer-label{text-align:left!important;font-weight:700;font-size:8px!important;padding-left:2mm!important}.shift-legend{font-size:8px;margin-top:2mm;text-align:left}.center{text-align:center}@media print{.ef-page{break-after:page}.ef-page:last-child{break-after:auto}}`}
 
  const filteredGroups=groupFilter==='ALL'?groups:groups.filter(g=>g.id===groupFilter)
  return <><Header profile={profile} title="Admin Extra Fooding"/><main className="admin-main"><nav className="tabs">{[['dashboard','Dashboard'],['data','Data & Koreksi'],['periods','Periode'],['employees','Karyawan'],['leaders','Leader'],['audit','Audit']].map(([id,label])=><button key={id} className={tabs===id?'active':''} onClick={()=>setTabs(id)}>{label}</button>)}</nav><Alert message={msg} error={err}/>{tabs==='dashboard'&&<Dashboard periods={periods} groups={groups} rows={rows} period={period} selected={selected} setSelected={setSelected} setTab={setTabs}/>} {tabs==='data'&&<DataTab period={period} periods={periods} selected={selected} setSelected={setSelected} groups={groups} groupFilter={groupFilter} setGroupFilter={setGroupFilter} dateFilter={dateFilter} setDateFilter={setDateFilter} shiftFilter={shiftFilter} setShiftFilter={setShiftFilter} rows={rows} correct={correct} exportCsv={exportCsv} printReport={printReport}/>} {tabs==='periods'&&<PeriodsTab periods={periods} save={savePeriod} remove={deletePeriod} busy={loading}/>} {tabs==='employees'&&<EmployeesTab employees={employees} groups={groups} save={saveEmployee}/>} {tabs==='leaders'&&<LeadersTab leaders={leaders} groups={groups} save={saveLeader}/>} {tabs==='audit'&&<AuditTab audits={audits}/>}</main></>}
