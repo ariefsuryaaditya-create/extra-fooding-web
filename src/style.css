@@ -4,22 +4,3 @@
 @media print{body{background:#fff;font-size:10px}header,.tabs,.toolbar,.filters,.actions,.no-print,.notice,.error,.bottom{display:none!important}main{padding:0;max-width:none}.table-wrap{overflow:visible;max-height:none;border:0;border-radius:0}.table-wrap table{width:100%;min-width:0}.table-wrap th,.table-wrap td{font-size:9px;padding:4px}.print-only{display:block}.print-only h1{font-size:16px;text-align:center}.print-only p{margin:3px 0}.status{border:0;background:none;padding:0}.card{box-shadow:none}}
 
 .admin-link{text-align:center;margin:16px 0 0;font-size:12px}.admin-link a{color:#475569;text-decoration:none}.admin-link a:hover{text-decoration:underline}.nik-login .login-card{width:min(430px,100%)}
-
-/* Leader mobile table: prevent sticky-column overlap with shift cells */
-.leader-table-wrap{overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.leader-table{width:max-content!important;min-width:0!important}
-.leader-table th,.leader-table td{vertical-align:middle}
-.leader-table th:nth-child(1),.leader-table td:nth-child(1){width:96px;min-width:96px}
-.leader-table th:nth-child(2),.leader-table td:nth-child(2){width:235px;min-width:235px}
-.leader-table th:nth-child(n+3),.leader-table td:nth-child(n+3){width:115px;min-width:115px;text-align:center}
-.leader-table td select{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box}
-.leader-table .lock{display:block;text-align:center;line-height:1.1}
-@media(max-width:600px){
-  .leader-table th:first-child,.leader-table td:first-child,.leader-table .name{position:static!important;left:auto!important;z-index:auto!important;background:inherit}
-  .leader-table th{position:sticky;top:0;z-index:2}
-  .leader-table th:nth-child(1),.leader-table td:nth-child(1){width:96px;min-width:96px}
-  .leader-table th:nth-child(2),.leader-table td:nth-child(2){width:235px;min-width:235px}
-  .leader-table th:nth-child(n+3),.leader-table td:nth-child(n+3){width:115px;min-width:115px}
-  .leader-table td{padding:7px 6px}
-  .leader-table td select{height:36px;min-height:36px;padding:5px 7px}
-}
