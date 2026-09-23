@@ -226,10 +226,9 @@ function printCss(){return `
   .ef-table th{height:8.5mm;font-size:8px;font-weight:700}
   .ef-table .c-no{width:7mm}.ef-table .c-nik{width:18mm}.ef-table .c-name{width:46mm}
   .ef-table .c-day{width:13mm}.ef-table .c-total{width:14mm}.ef-table .c-sign{width:20mm}
-  /* Paksa garis kanan kolom TTD tetap tercetak seperti border kanan tabel meta */
-  .ef-table tr > :last-child{border-right:0!important;position:relative}
-  .ef-table tr > :last-child::after{content:"";position:absolute;top:-1px;right:-1px;bottom:-1px;width:1px;background:#000;display:block;pointer-events:none;z-index:20}
-  .ef-table .sign-cell{position:relative}
+  .ef-table tr > :last-child{
+    border-right:1px solid #000!important;
+  }
   .ef-table .nik{font-size:8.5px;font-weight:700}
   .ef-table .name-cell{text-align:left;padding-left:1.2mm;font-size:8px;font-weight:700;white-space:normal;word-break:normal}
   .ef-table .food{height:5.5mm;position:relative;overflow:hidden;padding:0!important}
