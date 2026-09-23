@@ -226,8 +226,12 @@ function printCss(){return `
   .ef-table th{height:8.5mm;font-size:8px;font-weight:700}
   .ef-table .c-no{width:7mm}.ef-table .c-nik{width:18mm}.ef-table .c-name{width:46mm}
   .ef-table .c-day{width:13mm}.ef-table .c-total{width:14mm}.ef-table .c-sign{width:20mm}
-  .ef-table tr > :last-child{
+  /* Paksa batas kolom TTD tercetak di sisi kiri dan kanan */
+  .ef-table tr > :last-child,
+  .ef-table .sign-cell{
+    border-left:1px solid #000!important;
     border-right:1px solid #000!important;
+    box-shadow:inset 1px 0 0 #000,inset -1px 0 0 #000;
   }
   .ef-table .nik{font-size:8.5px;font-weight:700}
   .ef-table .name-cell{text-align:left;padding-left:1.2mm;font-size:8px;font-weight:700;white-space:normal;word-break:normal}
